@@ -1,6 +1,6 @@
 import express from "express";
 import { createTable } from "./db/config.js";
-import { router } from "./routes/tutorials.js";
+import { router } from "./routes/tutorialsRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import notFound from "./middleware/notFound.js";
 
