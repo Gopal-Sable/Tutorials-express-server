@@ -1,6 +1,7 @@
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 
+// Create a connection to the database
 export default function openDb() {
     return open({
         filename: "./database.db",
@@ -8,6 +9,7 @@ export default function openDb() {
     });
 }
 
+// Cretes a table if not exists
 export function createTable() {
     let tableSchema = `CREATE TABLE IF NOT EXISTS tutorials (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

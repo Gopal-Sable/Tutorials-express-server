@@ -2,15 +2,19 @@ import openDb from "../db/config.js";
 
 const db = await openDb();
 
+//  Helper function for error handling
 const sendError = (msg, status, next) => {
     const err = new Error(msg);
     err.status = status;
     next(err);
 };
 
+//  Gives all Tutorials or queried title
 const getAllTutorials = (req, res, next) => {
     if (req.query.title) {
-        db.all(`SELECT * FROM tutorials where title like '%${req.query.title}%';`)
+        db.all(
+            `SELECT * FROM tutorials where title like '%${req.query.title}%'`
+        )
             .then((tutorials) => res.status(200).json(tutorials))
             .catch(next);
         return;
@@ -20,6 +24,7 @@ const getAllTutorials = (req, res, next) => {
         .catch(next);
 };
 
+//  Gives data
 const getTutorialById = (req, res, next) => {
     const tutorialId = req.params.id;
     if (isNaN(tutorialId)) {
@@ -27,7 +32,9 @@ const getTutorialById = (req, res, next) => {
     }
     db.get("select * from tutorials where id=?", [tutorialId])
         .then((tutorials) => {
-            if (!tutorials) return sendError("ID not found", 404, next);
+            if (!tutorials) {
+                return sendError("ID not found", 404, next);
+            }
             res.status(200).json(tutorials);
         })
         .catch(next);
@@ -37,12 +44,16 @@ const createTutorial = (req, res, next) => {
     if (!req.body.title || !req.body.description) {
         return sendError("Please provide valid inputs", 400, next);
     }
-    db.run(
-        "INSERT INTO tutorials(title,description,published) VALUES(?,?,?)",
-        [req.body.title, req.body.description, req.body.published || 0]
-    )
+    db.run("INSERT INTO tutorials(title,description,published) VALUES(?,?,?)", [
+        req.body.title,
+        req.body.description,
+        req.body.published || 0,
+    ])
         .then((tutorials) => {
-            res.status(201).json({ status: "Tutorial added", ID: tutorials.lastID });
+            res.status(201).json({
+                status: "Tutorial added",
+                ID: tutorials.lastID,
+            });
         })
         .catch(next);
 };
@@ -61,7 +72,9 @@ const updateTutorial = (req, res, next) => {
         [title, description, published, tutorialId]
     )
         .then((tutorials) => {
-            if (tutorials.changes < 1) return sendError("Id not found", 404, next);
+            if (tutorials.changes < 1) {
+                return sendError("Id not found", 404, next);
+            }
             res.status(200).json(tutorials);
         })
         .catch((error) => {
@@ -77,7 +90,8 @@ const deleteById = (req, res, next) => {
     }
     db.run("DELETE FROM tutorials WHERE id=?", [tutorialId])
         .then((tutorials) => {
-            if (tutorials.changes < 1) return sendError("Id not found", 404, next);
+            if (tutorials.changes < 1)
+                return sendError("Id not found", 404, next);
             res.status(200).json(tutorials);
         })
         .catch(next);
