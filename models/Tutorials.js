@@ -10,18 +10,20 @@ Tutorials.init(
         },
         title: {
             type: DataTypes.STRING,
+            allowNull: false,
         },
         description: {
             type: DataTypes.STRING,
+            allowNull: false,
         },
         published: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
-        }
+        },
     },
     {
         sequelize,
-        modelName: "Tutorials"
+        modelName: "Tutorials",
     }
 );
 
