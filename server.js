@@ -1,10 +1,10 @@
 import express from "express";
-import sequelize from "./db/db.js";
+import { createTable } from "./db/config.js";
 import { router } from "./routes/tutorials.js";
 import errorHandler from "./middleware/errorHandler.js";
 import notFound from "./middleware/notFound.js";
 
-sequelize.sync().then(() => console.log("db ready"));
+createTable();
 const app = express();
 app.use(express.json());
 const PORT = process.env.PORT || 8000;

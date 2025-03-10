@@ -7,7 +7,7 @@ import {
     deleteById,
     deleteAll,
     getAllPublished,
-} from "../controllers/tutorialController.js";
+} from "../controllers/tutorialsController.js";
 
 const router = Router();
 
