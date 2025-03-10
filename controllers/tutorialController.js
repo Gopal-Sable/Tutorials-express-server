@@ -1,40 +1,75 @@
 import { Op } from "sequelize";
 import Tutorials from "../models/Tutorials.js";
 
-const getAllTutorials = async (req, res) => {
-    if (req.query.title) {
-        const tutorials = await Tutorials.findAll({
-            where: {
-                title: {
-                    [Op.like]: `%${req.query.title}%`,
+const sendError = (msg, status, next) => {
+    const err = new Error(msg);
+    err.status = status;
+    next(err);
+};
+
+const getAllTutorials = async (req, res, next) => {
+    try {
+        if (req.query.title) {
+            const tutorials = await Tutorials.findAll({
+                where: {
+                    title: {
+                        [Op.like]: `%${req.query.title}%`,
+                    },
                 },
-            },
+            });
+            res.status(200).json(tutorials);
+            return;
+        }
+        const tutorials = await Tutorials.findAll();
+        res.status(200).json(tutorials);
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getTutorialById = async (req, res, next) => {
+    try {
+        const tutorialId = req.params.id;
+        if (isNaN(tutorialId)) {
+            return sendError("ID should be number", 400, next);
+        }
+        const tutorials = await Tutorials.findOne({
+            where: { id: tutorialId },
         });
         res.status(200).json(tutorials);
-        return;
+    } catch (error) {
+        next(error);
     }
-    const tutorials = await Tutorials.findAll();
-    res.status(200).json(tutorials);
 };
 
-const getTutorialById = async (req, res) => {
-    const tutorials = await Tutorials.findOne({ where: { id: req.params.id } });
-    res.status(200).json(tutorials);
-};
-
-const createTutorial = async (req, res) => {
-    const tutorials = await Tutorials.create(req.body);
-    res.status(200).json(tutorials);
+const createTutorial = async (req, res, next) => {
+    try {
+        if (!req.body.title || !req.body.description) {
+            return sendError("Please provide valid inputs", 400, next);
+        }
+        const tutorials = await Tutorials.create(req.body);
+        res.status(200).json(tutorials);
+    } catch (error) {
+        next(error);
+    }
 };
 const updateTutorial = async (req, res) => {
-    const { title, description, published } = req.body;
-    const tutorials = await Tutorials.update(
-        { title, description, published },
-        {
-            where: { id: req.params.id },
+    try {
+        const { title, description, published } = req.body;
+        if (!req.body) {
+            return sendError("Content can not be empty!", 400, next);
         }
-    );
-    res.status(200).json(tutorials);
+        const tutorials = await Tutorials.update(
+            { title, description, published },
+            {
+                where: { id: req.params.id },
+            }
+        );
+        res.status(200).json(tutorials);
+    } catch (error) {
+        error.status = 500;
+        next(error);
+    }
 };
 
 const deleteById = async (req, res) => {
@@ -51,10 +86,7 @@ const deleteAll = async (req, res) => {
 };
 
 const getAllPublished = async (req, res) => {
-    console.log("iam hit");
-
     const tutorials = await Tutorials.findAll({ where: { published: true } });
-
     res.status(200).json(tutorials);
 };
 export {
