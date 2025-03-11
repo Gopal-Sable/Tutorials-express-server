@@ -24,7 +24,7 @@ const getAllTutorials = (req, res, next) => {
         .catch(next);
 };
 
-//  Gives data
+//  Gives data of given Id
 const getTutorialById = (req, res, next) => {
     const tutorialId = req.params.id;
     if (isNaN(tutorialId)) {
@@ -35,11 +35,12 @@ const getTutorialById = (req, res, next) => {
             if (!tutorials) {
                 return sendError("ID not found", 404, next);
             }
-            res.status(200).json(tutorials);
+            return res.status(200).json(tutorials);
         })
         .catch(next);
 };
 
+// Creates New Tutorial
 const createTutorial = (req, res, next) => {
     if (!req.body.title || !req.body.description) {
         return sendError("Please provide valid inputs", 400, next);
@@ -50,7 +51,7 @@ const createTutorial = (req, res, next) => {
         req.body.published || 0,
     ])
         .then((tutorials) => {
-            res.status(201).json({
+            return res.status(201).json({
                 status: "Tutorial added",
                 ID: tutorials.lastID,
             });
@@ -58,6 +59,7 @@ const createTutorial = (req, res, next) => {
         .catch(next);
 };
 
+// Updates Tutorial
 const updateTutorial = (req, res, next) => {
     const tutorialId = req.params.id;
     const { title, description, published } = req.body;
@@ -75,7 +77,7 @@ const updateTutorial = (req, res, next) => {
             if (tutorials.changes < 1) {
                 return sendError("Id not found", 404, next);
             }
-            res.status(200).json(tutorials);
+            return res.status(200).json(tutorials);
         })
         .catch((error) => {
             error.status = 500;
@@ -83,6 +85,7 @@ const updateTutorial = (req, res, next) => {
         });
 };
 
+// Delete tutorial of given ID
 const deleteById = (req, res, next) => {
     const tutorialId = req.params.id;
     if (!tutorialId || isNaN(tutorialId)) {
@@ -90,19 +93,22 @@ const deleteById = (req, res, next) => {
     }
     db.run("DELETE FROM tutorials WHERE id=?", [tutorialId])
         .then((tutorials) => {
-            if (tutorials.changes < 1)
+            if (tutorials.changes < 1) {
                 return sendError("Id not found", 404, next);
-            res.status(200).json(tutorials);
+            }
+            return res.status(200).json(tutorials);
         })
         .catch(next);
 };
 
+// Deletes all tutorials
 const deleteAll = (req, res, next) => {
     db.run("DELETE FROM tutorials")
         .then((tutorials) => res.status(200).json(tutorials))
         .catch(next);
 };
 
+//  Gives all published tutorials
 const getAllPublished = (req, res, next) => {
     db.all("SELECT * FROM tutorials WHERE published=?", [1])
         .then((tutorials) => res.status(200).json(tutorials))

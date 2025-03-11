@@ -4,7 +4,7 @@ import { open } from "sqlite";
 // Create a connection to the database
 export default function openDb() {
     return open({
-        filename: "./database.db",
+        filename: "./db/database.db",
         driver: sqlite3.Database,
     });
 }
