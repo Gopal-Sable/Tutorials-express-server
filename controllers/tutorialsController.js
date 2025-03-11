@@ -77,7 +77,9 @@ const updateTutorial = (req, res, next) => {
             if (tutorials.changes < 1) {
                 return sendError("Id not found", 404, next);
             }
-            return res.status(200).json(tutorials);
+            return res
+                .status(200)
+                .json({ Message: "Tutorial updated successfully" });
         })
         .catch((error) => {
             error.status = 500;
@@ -96,7 +98,9 @@ const deleteById = (req, res, next) => {
             if (tutorials.changes < 1) {
                 return sendError("Id not found", 404, next);
             }
-            return res.status(200).json(tutorials);
+            return res
+                .status(200)
+                .json({ Message: "Tutorial deleted successfully" });
         })
         .catch(next);
 };
@@ -104,7 +108,12 @@ const deleteById = (req, res, next) => {
 // Deletes all tutorials
 const deleteAll = (req, res, next) => {
     db.run("DELETE FROM tutorials")
-        .then((tutorials) => res.status(200).json(tutorials))
+        .then((tutorials) => {
+            if (tutorials.changes < 1) {
+                return sendError("No tutorial found for delete", 404, next);
+            }
+            return res.status(200).json({ Message: "Tutorials deleted successfully" });
+        })
         .catch(next);
 };
 
