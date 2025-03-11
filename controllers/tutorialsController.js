@@ -63,7 +63,7 @@ const createTutorial = (req, res, next) => {
 const updateTutorial = (req, res, next) => {
     const tutorialId = req.params.id;
     const { title, description, published } = req.body;
-    if (!req.body) {
+    if (!title || !description || !published) {
         return sendError("Content can not be empty!", 400, next);
     }
     if (!tutorialId || isNaN(tutorialId)) {
@@ -112,7 +112,9 @@ const deleteAll = (req, res, next) => {
             if (tutorials.changes < 1) {
                 return sendError("No tutorial found for delete", 404, next);
             }
-            return res.status(200).json({ Message: "Tutorials deleted successfully" });
+            return res
+                .status(200)
+                .json({ Message: "Tutorials deleted successfully" });
         })
         .catch(next);
 };
